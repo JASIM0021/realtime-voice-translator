@@ -12,5 +12,6 @@ This project demonstrates a real-time voice translation system using Python, AI,
 ## Requirements
 
 ```bash
+
 uv pip install -r requirements.txt
 ```
