@@ -1,0 +1,71 @@
+{
+  "sample_count": 7,
+  "total_duration": 42,
+  "phrases": [
+    {
+      "id": 0,
+      "filename": "voice_samples/sample_0000.wav",
+      "duration": 6,
+      "prompt": "Hello, how are you today?",
+      "transcription": null,
+      "date_recorded": "2025-05-08 14:40:23",
+      "processed_file": "voice_model/processed/sample_0000.wav"
+    },
+    {
+      "id": 1,
+      "filename": "voice_samples/sample_0001.wav",
+      "duration": 6,
+      "prompt": "My name is [Your Name] and this is my voice.",
+      "transcription": "hello how are you today",
+      "date_recorded": "2025-05-08 14:40:37",
+      "processed_file": "voice_model/processed/sample_0001.wav"
+    },
+    {
+      "id": 2,
+      "filename": "voice_samples/sample_0002.wav",
+      "duration": 6,
+      "prompt": "My name is [Your Name] and this is my voice.",
+      "transcription": "Ishq jasimuddin and this is my voice my name is SK jasimuddin and this is my",
+      "date_recorded": "2025-05-08 14:42:05",
+      "processed_file": "voice_model/processed/sample_0002.wav"
+    },
+    {
+      "id": 3,
+      "filename": "voice_samples/sample_0003.wav",
+      "duration": 6,
+      "prompt": "The quick brown fox jumps over the lazy dog.",
+      "transcription": "Iske jasimuddin and this is my voice",
+      "date_recorded": "2025-05-08 14:42:35",
+      "processed_file": "voice_model/processed/sample_0003.wav"
+    },
+    {
+      "id": 4,
+      "filename": "voice_samples/sample_0004.wav",
+      "duration": 6,
+      "prompt": "Could you speak more slowly please?",
+      "transcription": null,
+      "date_recorded": "2025-05-08 14:43:10",
+      "processed_file": "voice_model/processed/sample_0004.wav"
+    },
+    {
+      "id": 5,
+      "filename": "voice_samples/sample_0005.wav",
+      "duration": 6,
+      "prompt": "Let me translate that for you.",
+      "transcription": "could you speak more slowly please",
+      "date_recorded": "2025-05-08 14:43:21",
+      "processed_file": "voice_model/processed/sample_0005.wav"
+    },
+    {
+      "id": 6,
+      "filename": "voice_samples/sample_0006.wav",
+      "duration": 6,
+      "prompt": "This is a sample of my natural speaking voice.",
+      "transcription": "could you speak more slowly please",
+      "date_recorded": "2025-05-08 14:43:32",
+      "processed_file": "voice_model/processed/sample_0006.wav"
+    }
+  ],
+  "created": "2025-05-08 14:40:01",
+  "sample_rate": 22050
+}

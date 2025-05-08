@@ -1,0 +1,14 @@
+flask==2.2.5
+werkzeug==2.3.7
+flask-socketio==5.3.6
+speechrecognition==3.8.1
+googletrans==4.0.0-rc1
+gtts==2.2.3
+playsound==1.2.2
+python-engineio==4.3.0
+python-socketio==5.5.0
+eventlet==0.33.0
+pyaudio 
+pyttsx3
+gTTS
+playsound

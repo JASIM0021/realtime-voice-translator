@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Video Conference</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .controls {
+        margin-bottom: 20px;
+      }
+      .btn {
+        padding: 8px 16px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 10px;
+      }
+      .video-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      video {
+        width: 100%;
+        height: 225px;
+        background: #000;
+        border-radius: 8px;
+      }
+      #localVideo {
+        transform: scaleX(-1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="controls">
+        <button id="toggleVideo" class="btn">Camera Off</button>
+        <button id="toggleAudio" class="btn">Mic Off</button>
+        <input type="text" id="roomId" placeholder="Room ID" class="btn" />
+        <button id="joinButton" class="btn">Join Room</button>
+      </div>
+      <div class="video-container">
+        <video id="localVideo" autoplay muted playsinline></video>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+      const socket = io();
+      let localStream;
+      let peers = {};
+      const configuration = {
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+      };
+
+      // Elements
+      const toggleVideo = document.getElementById('toggleVideo');
+      const toggleAudio = document.getElementById('toggleAudio');
+      const joinButton = document.getElementById('joinButton');
+      const roomId = document.getElementById('roomId');
+      const videoContainer = document.querySelector('.video-container');
+
+      // Media controls
+      toggleVideo.addEventListener('click', async () => {
+        if (localStream) {
+          const videoTrack = localStream.getVideoTracks()[0];
+          if (videoTrack) {
+            videoTrack.enabled = !videoTrack.enabled;
+            toggleVideo.textContent = videoTrack.enabled
+              ? 'Camera On'
+              : 'Camera Off';
+          }
+        }
+      });
+
+      toggleAudio.addEventListener('click', async () => {
+        if (localStream) {
+          const audioTrack = localStream.getAudioTracks()[0];
+          if (audioTrack) {
+            audioTrack.enabled = !audioTrack.enabled;
+            toggleAudio.textContent = audioTrack.enabled ? 'Mic On' : 'Mic Off';
+          }
+        }
+      });
+
+      // Initialize media
+      async function initMedia() {
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+          });
+          document.getElementById('localVideo').srcObject = localStream;
+          toggleVideo.textContent = 'Camera On';
+          toggleAudio.textContent = 'Mic On';
+        } catch (error) {
+          console.error('Error accessing media devices:', error);
+        }
+      }
+
+      // WebRTC functions
+      function createPeerConnection(sid) {
+        const peerConnection = new RTCPeerConnection(configuration);
+
+        localStream.getTracks().forEach(track => {
+          peerConnection.addTrack(track, localStream);
+        });
+
+        peerConnection.onicecandidate = event => {
+          if (event.candidate) {
+            socket.emit('ice_candidate', {
+              candidate: event.candidate,
+              target: sid,
+            });
+          }
+        };
+
+        peerConnection.ontrack = event => {
+          const remoteVideo = document.createElement('video');
+          remoteVideo.id = `remote-${sid}`;
+          remoteVideo.autoplay = true;
+          remoteVideo.playsInline = true;
+          remoteVideo.srcObject = event.streams[0];
+          videoContainer.appendChild(remoteVideo);
+        };
+
+        peers[sid] = peerConnection;
+        return peerConnection;
+      }
+
+      async function initiateCall(sid) {
+        const peerConnection = createPeerConnection(sid);
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        socket.emit('offer', {
+          offer: offer,
+          target: sid,
+        });
+      }
+
+      // Socket handlers
+      socket.on('existing_users', data => {
+        data.users.forEach(sid => {
+          if (sid !== socket.id) {
+            initiateCall(sid);
+          }
+        });
+      });
+
+      socket.on('user_joined', data => {
+        initiateCall(data.sid);
+      });
+
+      socket.on('offer', async data => {
+        const peerConnection = createPeerConnection(data.sender);
+        await peerConnection.setRemoteDescription(data.offer);
+
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        socket.emit('answer', {
+          answer: answer,
+          target: data.sender,
+        });
+      });
+
+      socket.on('answer', async data => {
+        const peerConnection = peers[data.sender];
+        await peerConnection.setRemoteDescription(data.answer);
+      });
+
+      socket.on('ice_candidate', data => {
+        const peerConnection = peers[data.sender];
+        if (peerConnection) {
+          peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+      });
+
+      socket.on('user_left', data => {
+        const videoElement = document.getElementById(`remote-${data.sid}`);
+        if (videoElement) videoElement.remove();
+        if (peers[data.sid]) {
+          peers[data.sid].close();
+          delete peers[data.sid];
+        }
+      });
+
+      // Join room
+      joinButton.addEventListener('click', () => {
+        const room = roomId.value || 'default-room';
+        socket.emit('join_room', { room });
+        initMedia();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Real-Time Translator</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="controls">
+        <button id="webcamToggle" class="btn">Webcam: Off</button>
+        <button id="micToggle" class="btn">Mic: Off</button>
+        <select id="languageSelect" class="btn">
+          <option value="en">English</option>
+          <option value="bn">Bengali</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+        </select>
+        <input type="text" id="roomInput" placeholder="Room ID" class="btn" />
+        <button id="joinRoom" class="btn">Join Room</button>
+      </div>
+
+      <div class="video-container">
+        <video id="localVideo" autoplay muted playsinline></video>
+      </div>
+
+      <div id="translationContainer"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="/static/main.js"></script>
+  </body>
+</html>
